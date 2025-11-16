@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <title>Stock Information Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap 4 -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+
+    <div class="page-bg py-3 d-flex justify-content-center">
+      <div class="container px-2">
+        <div class="dashboard-wrapper mx-auto">
+
+          <!-- 헤더: 종목명 / 코드 / 섹터 -->
+          <header class="mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="badge badge-soft-primary mb-1" id="stock-sector-badge">
+                  반도체/장비
+                </div>
+                <h3 class="mb-0" id="stock-name-main">제영솔루텍</h3>
+                <small class="text-muted" id="stock-code-main">049630 · KOSDAQ</small>
+              </div>
+              <div class="text-right">
+                <div class="realtime-label">실시간 현재가</div>
+                <div class="current-price" id="stock-price-main">6,230</div>
+                <div class="change-line" id="stock-change-main">+430 (+7.41%)</div>
+              </div>
+            </div>
+          </header>
+
+          <!-- 1. 상단 요약 카드 -->
+          <section class="card card-elevated mb-3">
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-3">
+                <div>
+                  <div class="small text-muted mb-1">오늘 시가</div>
+                  <div class="metric-value" id="metric-open">5,800</div>
+                </div>
+                <div>
+                  <div class="small text-muted mb-1">전일 종가</div>
+                  <div class="metric-value" id="metric-prev-close">5,800</div>
+                </div>
+                <div>
+                  <div class="small text-muted mb-1">거래량(주)</div>
+                  <div class="metric-value" id="metric-volume">12,345,678</div>
+                </div>
+                <div>
+                  <div class="small text-muted mb-1">거래대금(백만)</div>
+                  <div class="metric-value" id="metric-trading-value">98,765</div>
+                </div>
+              </div>
+
+              <hr>
+
+              <div class="row text-center">
+                <div class="col-4 pb-2">
+                  <div class="mini-label text-danger">고가</div>
+                  <div class="mini-box mini-box-high" id="metric-high">6,450</div>
+                </div>
+                <div class="col-4 pb-2">
+                  <div class="mini-label text-primary">저가</div>
+                  <div class="mini-box mini-box-low" id="metric-low">5,700</div>
+                </div>
+                <div class="col-4 pb-2">
+                  <div class="mini-label text-secondary">52주 최고/최저</div>
+                  <div class="mini-box" id="metric-52w">
+                    7,800 / 3,200
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 2. 가격 차트 -->
+          <section class="card card-elevated mb-3">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">가격 추이</h6>
+                <div class="btn-group btn-group-sm" role="group" aria-label="기간 선택">
+                  <button type="button" class="btn btn-outline-secondary period-btn active" data-period="1D">1D</button>
+                  <button type="button" class="btn btn-outline-secondary period-btn" data-period="1W">1W</button>
+                  <button type="button" class="btn btn-outline-secondary period-btn" data-period="1M">1M</button>
+                  <button type="button" class="btn btn-outline-secondary period-btn" data-period="3M">3M</button>
+                  <button type="button" class="btn btn-outline-secondary period-btn" data-period="1Y">1Y</button>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+              </div>
+            </div>
+          </section>
+
+          <!-- 3. 투자자 동향 (막대 그래프) -->
+          <section class="card card-elevated mb-3">
+            <div class="card-body">
+              <h6 class="mb-3">투자자 동향</h6>
+              <div id="investor-bars">
+                <!-- JS 렌더링 -->
+              </div>
+            </div>
+          </section>
+
+          <!-- 4. 해당 섹터 등락률 -->
+          <section class="card card-elevated mb-3">
+            <div class="card-body">
+              <h6 class="mb-3">해당 섹터 등락률</h6>
+              <div id="sector-summary">
+                <!-- JS 렌더링 -->
+              </div>
+            </div>
+          </section>
+
+          <!-- 5. 뉴스 리스트 -->
+          <section class="card card-elevated mb-3">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex align-items-center">
+                  <div class="news-icon mr-2"></div>
+                  <h6 class="mb-0">관련 뉴스</h6>
+                </div>
+                <small class="text-muted">실시간 뉴스 요약</small>
+              </div>
+              <div id="news-list">
+                <!-- JS 렌더링 -->
+              </div>
+            </div>
+          </section>
+
+          <!-- 6. 거래 활력 지수 -->
+          <section class="card card-elevated mb-4">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">거래 활력 지수</h6>
+                <span class="badge badge-soft-success" id="vitality-score-badge">78점 · 높음</span>
+              </div>
+              <p class="small text-muted mb-2">
+                거래량, 가격 변동성, 시장 관심도 등을 종합하여 현재 종목의 거래 활성화 정도를 나타내는 지표입니다.
+              </p>
+
+              <div class="mb-2">
+                <div class="d-flex justify-content-between mb-1">
+                  <span>거래량 활성도</span>
+                  <span id="vitality-volume-label">85점</span>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-success" id="vitality-volume-bar" role="progressbar"></div>
+                </div>
+              </div>
+
+              <div class="mb-2">
+                <div class="d-flex justify-content-between mb-1">
+                  <span>가격 변동성</span>
+                  <span id="vitality-volatility-label">72점</span>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-warning" id="vitality-volatility-bar" role="progressbar"></div>
+                </div>
+              </div>
+
+              <div class="mb-2">
+                <div class="d-flex justify-content-between mb-1">
+                  <span>시장 관심도</span>
+                  <span id="vitality-interest-label">81점</span>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-info" id="vitality-interest-bar" role="progressbar"></div>
+                </div>
+              </div>
+
+              <p class="vitality-footnote small text-muted mt-2 mb-0">
+                80 이상(높음) / 50~80(보통) / 50 미만(낮음)
+              </p>
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- JS: jQuery + Popper + Bootstrap4 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+
+    <!-- App JS -->
+    <script src="./js/app.js"></script>
+  </body>
+</html>

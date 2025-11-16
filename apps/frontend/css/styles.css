@@ -1,0 +1,246 @@
+/* 전체 배경 */
+body {
+  background-color: #eef2ff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.page-bg {
+  min-height: 100vh;
+}
+
+/* 모바일 중심 너비 */
+.dashboard-wrapper {
+  max-width: 780px;
+}
+
+/* 상단 요약 */
+.current-price {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+.realtime-label {
+  font-size: 0.75rem;      /* 글자 조금 작게 */
+  color: #6b7280;          /* 회색 계열 */
+  margin-bottom: 0.15rem;  /* 아래로 약간 여백 */
+}
+.change-line {
+  font-size: 0.9rem;
+}
+
+.badge-soft-primary {
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+
+.badge-soft-success {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+/* 카드 공통 */
+.card-elevated {
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+/* 메트릭 */
+.metric-value {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.mini-label {
+  font-size: 0.8rem;
+  margin-bottom: 0.25rem;
+}
+
+.mini-box {
+  border-radius: 0.75rem;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.85rem;
+  background-color: #f9fafb;
+}
+
+.mini-box-high {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.mini-box-low {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* 차트 */
+.chart-container {
+  position: relative;
+  height: 260px;
+}
+
+/* 투자자 동향 바 */
+.investor-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.investor-label {
+  width: 60px;
+  color: #374151;
+}
+
+.investor-bar-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.investor-half {
+  width: 50%;
+  display: flex;
+  align-items: center;
+}
+
+.investor-half-left {
+  justify-content: flex-end;
+  padding-right: 4px;
+}
+
+.investor-half-right {
+  justify-content: flex-start;
+  padding-left: 4px;
+}
+
+.investor-axis {
+  width: 2px;
+  height: 24px;
+  background-color: #e5e7eb;
+}
+
+.investor-bar-fill {
+  height: 24px;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.investor-bar-fill.negative {
+  background-color: #3b82f6; /* 파란색 */
+  border-radius: 999px 0 0 999px;
+}
+
+.investor-bar-fill.positive {
+  background-color: #ef4444; /* 빨간색 */
+  border-radius: 0 999px 999px 0;
+}
+
+.investor-value {
+  width: 70px;
+  text-align: right;
+  font-size: 0.8rem;
+}
+
+/* (옛) 섹터 카드 - 필요시 사용 가능 */
+.sector-card {
+  border-radius: 0.75rem;
+  padding: 0.6rem 0.7rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.85rem;
+  border: 1px solid #e5e7eb;
+}
+
+.sector-name {
+  font-weight: 500;
+}
+
+.sector-badge {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+}
+
+/* 🔵 해당 섹터 등락률 카드 */
+.sector-summary-card {
+  border-radius: 1rem;
+  border: 1px solid #2563eb;
+  background-color: #eff6ff;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+}
+
+.sector-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+
+.sector-summary-name {
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.sector-summary-tag {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.sector-summary-sector-change {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.sector-summary-sector-change span:first-child {
+  font-size: 1.1rem;
+  margin-right: 0.25rem;
+}
+
+.sector-summary-divider {
+  margin: 0.45rem 0 0.5rem;
+  border-color: #dbeafe;
+}
+
+.sector-summary-stock-change {
+  font-weight: 600;
+}
+
+/* 뉴스 아이콘 */
+.news-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+}
+
+/* 뉴스 리스트 */
+.news-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.85rem;
+}
+
+.news-item:last-child {
+  border-bottom: none;
+}
+
+.news-meta {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* 거래 활력 */
+.vitality-footnote {
+  line-height: 1.4;
+}
+
+/* 버튼 그룹 (기간 선택) */
+.period-btn.active {
+  background-color: #4f46e5;
+  color: #fff;
+  border-color: #4f46e5;
+}
