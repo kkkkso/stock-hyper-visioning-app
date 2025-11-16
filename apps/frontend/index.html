@@ -84,7 +84,7 @@
             </div>
           </section>
 
-          <!-- 2. 가격 차트 -->
+          <!-- 2. 가격 차트 + 거래량 차트 -->
           <section class="card card-elevated mb-3">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center mb-2">
@@ -97,8 +97,18 @@
                   <button type="button" class="btn btn-outline-secondary period-btn" data-period="1Y">1Y</button>
                 </div>
               </div>
-              <div class="chart-container">
+
+              <!-- 가격 차트 -->
+              <div class="chart-container mb-3">
                 <canvas id="priceChart"></canvas>
+              </div>
+
+              <!-- 거래량 차트 -->
+              <div class="volume-section">
+                <div class="volume-label">거래량</div>
+                <div class="chart-container volume-chart">
+                  <canvas id="volumeChart"></canvas>
+                </div>
               </div>
             </div>
           </section>

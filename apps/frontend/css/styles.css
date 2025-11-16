@@ -100,7 +100,29 @@ body {
 /* 차트 */
 .chart-container {
   position: relative;
-  height: 260px;
+  height: 220px;
+}
+
+/* 거래량 섹션 */
+.volume-section {
+  margin-top: 0.5rem;
+}
+
+.volume-label {
+  font-size: 0.85rem;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+/* 거래량 차트는 조금 더 낮게 */
+.volume-chart {
+  height: 140px;
+}
+
+/* 캔버스가 컨테이너를 꽉 채우도록 */
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* 투자자 동향 바 */

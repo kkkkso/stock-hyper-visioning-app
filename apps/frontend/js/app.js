@@ -58,36 +58,41 @@ const vitalityData = {
   marketInterest: 81,
 };
 
-// 기간별 차트용 더미
+// 기간별 차트용 더미 (가격 + 거래량 같이)
 function getChartData(period) {
   if (period === "1D") {
     return {
       labels: ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"],
       prices: [5800, 5950, 6020, 6100, 6200, 6300, 6230],
+      volumes: [6000000, 6200000, 5800000, 6100000, 5500000, 4200000, 3800000],
     };
   }
   if (period === "1W") {
     return {
       labels: ["월", "화", "수", "목", "금"],
       prices: [5420, 5600, 5750, 5900, 6230],
+      volumes: [4200000, 5100000, 4800000, 5300000, 6000000],
     };
   }
   if (period === "1M") {
     return {
       labels: ["1주차", "2주차", "3주차", "4주차"],
       prices: [5100, 5400, 5800, 6230],
+      volumes: [3800000, 4200000, 5100000, 6000000],
     };
   }
   if (period === "3M") {
     return {
       labels: ["-3M", "-2M", "-1M", "현재"],
       prices: [4300, 4800, 5400, 6230],
+      volumes: [3200000, 3500000, 4200000, 5800000],
     };
   }
   // 1Y
   return {
     labels: ["-1Y", "-9M", "-6M", "-3M", "현재"],
     prices: [3200, 3800, 4500, 5200, 6230],
+    volumes: [2500000, 2800000, 3200000, 3800000, 5800000],
   };
 }
 
@@ -270,37 +275,62 @@ function renderVitality(v) {
 // ===== Chart.js =====
 
 let priceChart = null;
+let volumeChart = null;
 
-function renderChart(period) {
-  const ctx = document.getElementById("priceChart").getContext("2d");
+function renderCharts(period) {
+  const priceCtx = document.getElementById("priceChart").getContext("2d");
+  const volumeCtx = document.getElementById("volumeChart").getContext("2d");
   const data = getChartData(period);
 
-  if (priceChart) {
-    priceChart.destroy();
-  }
+  if (priceChart) priceChart.destroy();
+  if (volumeChart) volumeChart.destroy();
 
-  priceChart = new Chart(ctx, {
+  // 🔴 가격 차트용 그라디언트
+  const priceGradient = priceCtx.createLinearGradient(
+    0,
+    0,
+    0,
+    priceCtx.canvas.height || 200
+  );
+  priceGradient.addColorStop(0, "rgba(239, 68, 68, 0.35)");
+  priceGradient.addColorStop(1, "rgba(239, 68, 68, 0)");
+
+  priceChart = new Chart(priceCtx, {
     type: "line",
     data: {
       labels: data.labels,
       datasets: [
         {
-          label: "종가",
           data: data.prices,
-          fill: false,
+          fill: true,
+          backgroundColor: priceGradient,
+          borderColor: "#ef4444",
           borderWidth: 2,
+          lineTension: 0.3,
+          pointRadius: 3,
+          pointBackgroundColor: "#ef4444",
+          pointBorderWidth: 0,
         },
       ],
     },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
       legend: { display: false },
       scales: {
-        xAxes: [{ gridLines: { display: false } }],
+        xAxes: [
+          {
+            gridLines: { display: false },
+            ticks: { maxRotation: 0, minRotation: 0, padding: 8 },
+          },
+        ],
         yAxes: [
           {
             ticks: {
+              padding: 8,
               callback: (value) => value.toLocaleString(),
             },
+            gridLines: { color: "#e5e7eb" },
           },
         ],
       },
@@ -309,6 +339,69 @@ function renderChart(period) {
           label: (tooltipItem) =>
             tooltipItem.yLabel.toLocaleString() + "원",
         },
+      },
+      layout: {
+        padding: { left: 0, right: 8, top: 10, bottom: 10 },
+      },
+    },
+  });
+
+  // 🔵 거래량 차트용 그라디언트
+  const volumeGradient = volumeCtx.createLinearGradient(
+    0,
+    0,
+    0,
+    volumeCtx.canvas.height || 150
+  );
+  volumeGradient.addColorStop(0, "rgba(59, 130, 246, 0.4)");
+  volumeGradient.addColorStop(1, "rgba(59, 130, 246, 0)");
+
+  volumeChart = new Chart(volumeCtx, {
+    type: "line",
+    data: {
+      labels: data.labels,
+      datasets: [
+        {
+          data: data.volumes,
+          fill: true,
+          backgroundColor: volumeGradient,
+          borderColor: "#3b82f6",
+          borderWidth: 1.5,
+          lineTension: 0.3,
+          pointRadius: 0,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      legend: { display: false },
+      scales: {
+        xAxes: [
+          {
+            gridLines: { display: false },
+            ticks: { maxRotation: 0, minRotation: 0, padding: 8 },
+          },
+        ],
+        yAxes: [
+          {
+            ticks: {
+              padding: 8,
+              callback: (value) =>
+                (value / 1000000).toFixed(1) + "M",
+            },
+            gridLines: { color: "#e5e7eb" },
+          },
+        ],
+      },
+      tooltips: {
+        callbacks: {
+          label: (tooltipItem) =>
+            tooltipItem.yLabel.toLocaleString(),
+        },
+      },
+      layout: {
+        padding: { left: 0, right: 8, top: 5, bottom: 5 },
       },
     },
   });
@@ -321,7 +414,7 @@ function setupPeriodButtons() {
       buttons.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       const period = btn.getAttribute("data-period");
-      renderChart(period);
+      renderCharts(period);
     });
   });
 }
@@ -335,6 +428,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderSectorSummary(stockInfo, sectorSummary);
   renderNews(newsItems);
   renderVitality(vitalityData);
-  renderChart("1D");
+  renderCharts("1D");
   setupPeriodButtons();
 });
