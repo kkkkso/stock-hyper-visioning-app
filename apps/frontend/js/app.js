@@ -36,20 +36,73 @@ const newsItems = [
     title: "제영솔루텍, 3분기 실적 예상치 상회...영업이익 15% 증가",
     source: "한국경제",
     time: "2시간 전",
+    sentiment: "긍정",
   },
   {
     id: 2,
     title: "반도체 장비 수요 급증, 관련주 강세 지속 전망",
     source: "매일경제",
     time: "4시간 전",
+    sentiment: "긍정",
   },
   {
     id: 3,
-    title: "외국인, 코스닥 IT·부품주 순매수 확대",
+    title: "외국인 투자자, 이틀 연속 순매도...시장 불안 가중",
     source: "연합뉴스",
-    time: "6시간 전",
+    time: "5시간 전",
+    sentiment: "부정",
+  },
+  {
+    id: 4,
+    title: "제영솔루텍, 신규 해외 계약 체결...연말까지 실적 개선 기대",
+    source: "서울경제",
+    time: "7시간 전",
+    sentiment: "긍정",
+  },
+  {
+    id: 5,
+    title: "업계 전반 원자재 가격 상승...수익성 악화 우려",
+    source: "이데일리",
+    time: "9시간 전",
+    sentiment: "부정",
+  },
+  {
+    id: 6,
+    title: "코스닥 기술주 강세...반도체·2차전지 동반 상승",
+    source: "헤럴드경제",
+    time: "어제",
+    sentiment: "긍정",
+  },
+  {
+    id: 7,
+    title: "글로벌 반도체 업황 둔화 조짐...투자심리 위축",
+    source: "머니투데이",
+    time: "어제",
+    sentiment: "부정",
+  },
+  {
+    id: 8,
+    title: "제영솔루텍, AI 서버용 부품 공급 확대 소식에 강세",
+    source: "조선비즈",
+    time: "1일 전",
+    sentiment: "긍정",
+  },
+  {
+    id: 9,
+    title: "기관, IT·부품주 차익 실현 매도...단기 조정 가능성",
+    source: "매일경제",
+    time: "1일 전",
+    sentiment: "부정",
+  },
+  {
+    id: 10,
+    title: "연말 배당 기대감에 중소형 기술주 매수세 유입",
+    source: "한국경제",
+    time: "2일 전",
+    sentiment: "긍정",
   },
 ];
+
 
 const vitalityData = {
   overall: 78,
@@ -233,9 +286,18 @@ function renderSectorSummary(info, summary) {
 function renderNews(items) {
   const container = document.getElementById("news-list");
   container.innerHTML = "";
+
+  // 👉 최대 10개까지만 표시
+  const limited = items.slice(0, 10);
+
   items.forEach((n) => {
     const div = document.createElement("div");
     div.className = "news-item";
+
+    // 감성에 따라 클래스 결정
+    const sentimentClass =
+    n.sentiment === "긍정" ? "sentiment-positive" : "sentiment-negative";
+
     div.innerHTML = `
       <div>
         <div class="font-weight-bold mb-1">${n.title}</div>
@@ -245,6 +307,9 @@ function renderNews(items) {
           <span>${n.time}</span>
         </div>
       </div>
+      <span class="sentiment-badge ${sentimentClass}">
+        ${n.sentiment}
+      </span>
     `;
     container.appendChild(div);
   });

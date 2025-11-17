@@ -280,6 +280,34 @@ body {
   color: #6b7280;
 }
 
+/* 긍정, 부정 badge */
+.sentiment-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 🔸 가로는 길게, 세로는 얇게 */
+  height: 22px;          /* 세로 고정 */
+  padding: 0 10px;       /* 좌우 여유만 줌 */
+
+  border-radius: 999px;  /* 끝만 둥근 캡슐 */
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* 긍정 = 초록, 부정 = 빨강 */
+.sentiment-positive {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.sentiment-negative {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
 /* 거래 활력 */
 .vitality-footnote {
   line-height: 1.4;
