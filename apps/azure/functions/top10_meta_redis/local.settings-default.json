@@ -1,0 +1,16 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+  
+    "AnticSignalEventHubName": "kis-volume-rank-5min",
+    "AnticSignalEventHubConnectionString": "",
+  
+    "REDIS_HOST":"your-redis-name.redis.cache.windows.net",
+    "REDIS_PORT": "6380",
+    "REDIS_PASSWORD": "your-access-key",
+    "REDIS_DB": "0",
+    "REDIS_TOP10_KEY": "volume_rank:top10"
+  }
+}
