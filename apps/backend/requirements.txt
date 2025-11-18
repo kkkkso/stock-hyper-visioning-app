@@ -1,0 +1,12 @@
+fastapi[all]
+uvloop
+httptools
+uvicorn==0.38.0
+gunicorn==23.0.0
+https://github.com/AnticSignal/stock-hyper-visioning-app/releases/download/v0.1.0_antic_ext/antic_extensions-0.1.0-py3-none-any.whl
+
+python-multipart
+python-dotenv
+pydantic-settings
+pydantic>=2.9.0
+requests
