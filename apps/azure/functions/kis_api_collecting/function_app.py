@@ -12,33 +12,62 @@ app = func.FunctionApp()  # type: ignore
 client = KISClient(
     app_key=os.environ["KIS_APP_KEY"],
     app_secret=os.environ["KIS_APP_SECRET"],
-    request_interval=0.5
+    request_interval=0.5,
 )
 
 
-@app.function_name(name="kis-volumn_rank_collect_5min")
+def _build_volume_rank_schedule() -> str:
+    """환경 변수에 정의된 초 단위 주기를 Azure Functions CRON 식으로 변환한다."""
+    raw_value = os.environ.get("VOLUME_RANK_PULLING_INTERVAL", "300")
+    try:
+        interval = max(1, int(raw_value))
+    except ValueError:
+        logging.warning("VOLUME_RANK_PULLING_INTERVAL=%s 값이 잘못되어 300초로 대체합니다.", raw_value)
+        interval = 300
+
+    if interval < 60:
+        return f"*/{interval} * * * * *"
+
+    minutes, seconds = divmod(interval, 60)
+    if seconds == 0 and minutes < 60:
+        return f"0 */{minutes} * * * *"
+
+    hours, minutes = divmod(minutes, 60)
+    if seconds == 0 and minutes == 0 and hours < 24:
+        return f"0 0 */{hours} * * *"
+
+    logging.warning("지원하지 않는 interval=%s 값이 입력되어 5분 주기로 대체합니다.", interval)
+    return "0 */5 * * * *"
+
+
+VOLUME_RANK_SCHEDULE = _build_volume_rank_schedule()
+
+
+@app.function_name(name="kis_volume_rank_collect_interval")
 @app.event_hub_output(
     arg_name="kis_volume_rank",
     event_hub_name=os.environ["AnticSignalEventHubName"],
     connection="AnticSignalEventConnectionString",
 )
-@app.timer_trigger(schedule="0 */5 * * * *", arg_name="myTimer", run_on_startup=True, use_monitor=False)
-def volumn_rank_collect_5min(myTimer: func.TimerRequest, kis_volume_rank: func.Out[str]) -> None:  # type: ignore
+@app.timer_trigger(schedule=VOLUME_RANK_SCHEDULE, arg_name="myTimer", run_on_startup=True, use_monitor=False)
+def volume_rank_collect_interval(myTimer: func.TimerRequest, kis_volume_rank: func.Out[str]) -> None:  # type: ignore
     if myTimer.past_due:
         logging.info("The timer is past due!")
 
     data = fetch_volume_rank(client)
     kis_volume_rank.set(json.dumps(data, default=str))
-    logging.info("Python timer trigger function executed.")
+    logging.info("Volume rank timer function executed.")
 
 
 def _extract_stock_codes(payload: str) -> List[str]:
     """volume-rank 메시지에서 종목코드를 추출한다."""
     try:
-        data = json.loads(payload)["output"]
+        parsed = json.loads(payload)
     except json.JSONDecodeError:
         logging.warning("Skip message, invalid JSON: %s", payload)
         return []
+
+    data = parsed.get("output", parsed)
 
     candidates: Iterable[str] = []
     if isinstance(data, list):
@@ -78,8 +107,6 @@ def inquire_price_from_event(events: Sequence[func.EventHubEvent]) -> None:  # t
                 enriched_payloads.append(fetch_inquire_price(client, fid_input_iscd=code))
             except Exception as exc:  # pylint: disable=broad-except
                 logging.exception("Failed to fetch current price for %s: %s", code, exc)
-
-        # _persist_snapshot(enriched_payloads)
 
         logging.info(
             "Fetched %d current price rows for event sequence=%s",
