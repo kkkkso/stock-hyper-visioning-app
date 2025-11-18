@@ -1,5 +1,5 @@
 // ===== 더미 데이터 =====
-console.log("✅ app.js loaded");
+//console.log("✅ dashboard_page.js loaded");
 
 const stockInfo = {
   name: "제영솔루텍",

@@ -1,0 +1,253 @@
+/* 전체 배경 + 폰트: 다른 페이지와 통일 */
+body {
+  background-color: #eef2ff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+.page-bg {
+  min-height: 100vh;
+}
+
+/* 모바일 중심 너비 */
+.topchart-wrapper {
+  max-width: 780px;
+}
+
+/* 카드 공통 (dashboard와 동일 스타일) */
+.card-elevated {
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+/* 안내 배너 */
+.info-banner {
+  display: flex;
+  align-items: center;
+  padding: 0.65rem 0.8rem;
+  border-radius: 0.75rem;
+  border: 1px solid #bfdbfe;      /* 하늘색 테두리 */
+  background-color: #eff6ff;      /* 아주 옅은 파란 배경 */
+  font-size: 0.8rem;
+  color: #1d4ed8;                 /* 텍스트 파란색 */
+}
+
+.info-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background-color: #fef3c7;      /* 전구 뒷배경 노랑 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #f59e0b;                 /* 전구 색 */
+  margin-right: 0.45rem;
+}
+
+.info-text {
+  line-height: 1.4;
+}
+
+
+/* 상단 헤더 */
+.page-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #111827;
+}
+
+.page-subtitle {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* 메인으로 돌아가기 링크 */
+.back-link {
+  color: #4b5563;
+  font-size: 0.85rem;
+}
+
+.back-link:hover {
+  text-decoration: none;
+  color: #111827;
+}
+
+/* 부드러운 배지 (dashboard와 톤 맞춤) */
+.badge-soft-primary {
+  background-color: #e0e7ff;
+  color: #3730a3;
+  font-weight: 500;
+}
+
+/* 필터 그룹 */
+.filter-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-label {
+  font-size: 1.0rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-right: 0.65rem;
+  padding-left: 0.25rem;
+  margin-top: 0.2rem;   
+}
+
+/* 시장 / 기간 행 사이 구분선 */
+.filter-group + .filter-group {
+  border-top: 1px solid #e5e7eb;  /* 아주 옅은 회색 선 */
+  padding-top: 1.2rem;            /* 위쪽 여백 */
+  margin-top: 1.2rem;             /* 위와 살짝 띄우기 */
+}
+
+/* 기간 라벨만 아주 살짝 위로 올리기 */
+.filter-group:last-child .filter-label {
+  position: relative;
+  top: -1px;   /* -1 ~ -3px 사이에서 조절 */
+}
+
+
+/* pill 스타일 버튼 */
+.filter-pill {
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  color: #4b5563;
+  padding: 0.2rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.filter-pill:hover {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.filter-pill.active {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+/* 테이블 래퍼 */
+.volume-table-wrapper {
+  margin-top: 0.25rem;
+}
+
+/* 테이블 스타일 */
+.volume-table {
+  font-size: 0.8rem;
+}
+
+.volume-table thead th {
+  border-top: none;
+  border-bottom: 1px solid #e5e7eb;
+  color: #6b7280;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.volume-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.volume-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.volume-table td {
+  vertical-align: middle;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* 종목명 + 코드 */
+.stock-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.stock-code {
+  display: block;
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+/* 가격/등락 */
+.price-cell {
+  white-space: nowrap;
+}
+
+.change-positive {
+  color: #b91c1c; /* 빨강 */
+  font-weight: 600;
+}
+
+.change-negative {
+  color: #1d4ed8; /* 파랑 */
+  font-weight: 600;
+}
+
+/* 거래량 컬럼 */
+.volume-cell {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.volume-ratio {
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+/* 순위 배지 */
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.rank-badge-top3 {
+  background: linear-gradient(135deg, #22c1ff, #0ea5e9);
+  color: #f9fafb;
+}
+
+/* 행이 클릭 가능하다는 느낌 */
+.volume-table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.volume-table tbody tr:hover {
+  background-color: #f3f4ff; /* 아주 옅은 보라/파랑 톤 */
+}
+
+
+/* 푸터 설명 */
+.footnote {
+  line-height: 1.5;
+}
+
+/* 작은 화면에서 여백/폰트 조금 줄이기 */
+@media (max-width: 360px) {
+  .page-title {
+    font-size: 1.25rem;
+  }
+
+  .filter-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}

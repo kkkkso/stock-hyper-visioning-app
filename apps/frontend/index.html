@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>Antic Signal – 메인</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap 4 (dashboard와 동일 CDN) -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+
+    <!-- Index 전용 CSS -->
+    <link rel="stylesheet" href="./css/index_page.css" />
+  </head>
+  <body>
+    <div class="page-bg d-flex justify-content-center">
+      <div class="container px-3">
+        <div class="index-wrapper mx-auto">
+
+          <!-- 로고 영역 -->
+          <header class="index-header text-center">
+            <div class="logo-card mx-auto mb-4">
+                <img
+                src="./assets/img/index_page_logo.png"
+                alt="Antic Signal 로고"
+                class="logo-img"
+                />
+            </div>
+
+            <div class="title-block">
+              <h1 class="brand-title">Antic Signal</h1>
+              <p class="brand-subtitle">건강한 투자를 위한 AI 주식 비서</p>
+            </div>
+          </header>
+
+          <!-- 메뉴 버튼 영역 -->
+          <main class="index-main">
+            <!-- 거래량 상승 TOP 버튼 -->
+            <button
+              type="button"
+              class="menu-card menu-primary d-flex align-items-center justify-content-between"
+              id="btn-topchart"
+            >
+              <div class="text-left">
+                <div class="menu-title">거래량 상승 TOP</div>
+                <div class="menu-subtitle">거래량 급등주 분석</div>
+              </div>
+              <div class="menu-icon menu-icon-trend">
+                <!-- 간단한 화살표 아이콘 (SVG) -->
+                <svg
+                  viewBox="0 0 24 24"
+                  class="icon-svg"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M5 17l5-6 4 4 5-8"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M15 7h4v4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+            </button>
+
+            <!-- 추가 예정 버튼 -->
+            <button
+              type="button"
+              class="menu-card menu-secondary d-flex align-items-center justify-content-between"
+              id="btn-comingsoon"
+            >
+              <div class="text-left">
+                <div class="menu-title menu-title-muted">추가 예정</div>
+                <div class="menu-subtitle menu-subtitle-muted">
+                  더 많은 분석이 준비 중이에요
+                </div>
+              </div>
+              <div class="menu-icon menu-icon-lock">
+                <svg
+                  viewBox="0 0 24 24"
+                  class="icon-svg"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <rect
+                    x="4"
+                    y="11"
+                    width="16"
+                    height="9"
+                    rx="2"
+                    ry="2"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  />
+                  <path
+                    d="M8 11V8a4 4 0 0 1 8 0v3"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </div>
+            </button>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <!-- JS: jQuery + Popper + Bootstrap4 (dashboard와 동일) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Index 전용 JS -->
+    <script src="./js/index_page.js"></script>
+  </body>
+</html>

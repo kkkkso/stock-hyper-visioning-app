@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>Antic Signal – 거래량 상승 TOP</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap 4 (index / dashboard와 동일 CDN) -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+
+    <!-- Topchart 전용 CSS -->
+    <link rel="stylesheet" href="./css/topchart_page.css" />
+  </head>
+  <body>
+    <div class="page-bg py-3 d-flex justify-content-center">
+      <div class="container px-2">
+        <div class="topchart-wrapper mx-auto">
+
+          <!-- 상단 헤더 영역 -->
+          <header class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <button
+                type="button"
+                class="btn btn-link btn-sm p-0 back-link"
+                onclick="window.location.href='./index.html'"
+              >
+                ← 메인으로
+              </button>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h3 class="page-title mb-1">거래량 상승 TOP</h3>
+                <p class="page-subtitle mb-0">
+                  거래량 급등 상위 10개 종목을 한눈에 확인하세요.
+                </p>
+              </div>
+              <div class="text-right">
+                <span class="badge badge-soft-primary d-block mb-1">
+                  실시간 시그널
+                </span>
+                <small class="text-muted" id="as-of-label">
+                  기준: 2025-11-18 14:30
+                </small>
+              </div>
+            </div>
+          </header>
+
+          <!-- 필터 카드 -->
+          <section class="card card-elevated mb-3">
+            <div class="card-body">
+              <div class="filter-group mb-2">
+                <div class="filter-label">시장</div>
+                <div class="btn-group btn-group-sm" role="group">
+                  <button
+                    type="button"
+                    class="btn filter-pill active"
+                    data-market="ALL"
+                  >
+                    전체
+                  </button>
+                  <button
+                    type="button"
+                    class="btn filter-pill"
+                    data-market="KOSPI"
+                  >
+                    코스피
+                  </button>
+                  <button
+                    type="button"
+                    class="btn filter-pill"
+                    data-market="KOSDAQ"
+                  >
+                    코스닥
+                  </button>
+                </div>
+              </div>
+
+              <div class="filter-group mb-0">
+                <div class="filter-label">기간</div>
+                <div class="btn-group btn-group-sm" role="group">
+                  <button
+                    type="button"
+                    class="btn filter-pill active"
+                    data-period="TODAY"
+                  >
+                    당일
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- TOP 10 리스트 -->
+          <section class="card card-elevated mb-4">
+            <div class="card-body">
+
+              <!-- 🔔 안내 배너 -->
+              <div class="info-banner mb-3">
+                <div class="info-icon">💡</div>
+                <p class="info-text mb-0">
+                  종목을 클릭하면 관련한 투자 인사이트 대시보드를 확인하실 수 있습니다.
+                </p>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">거래량 급등 상위 10개 종목</h6>
+                <small class="text-muted">
+                  전일 대비 거래량 비율 순 정렬
+                </small>
+              </div>
+
+              <div class="table-responsive volume-table-wrapper">
+                <table class="table table-sm mb-0 volume-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">순위</th>
+                      <th scope="col">종목명</th>
+                      <th scope="col">현재가</th>
+                      <th scope="col">등락률</th>
+                      <th scope="col" class="text-right">
+                        거래량<br /><span class="thead-sub">/ 전일 대비</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="volume-table-body">
+                    <!-- JS 렌더링 -->
+                  </tbody>
+                </table>
+              </div>
+
+              <p class="footnote small text-muted mt-2 mb-0">
+                * 거래량 비율 = (당일 거래량 ÷ 전일 거래량) × 100  
+              </p>
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- JS: jQuery + Popper + Bootstrap4 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Topchart 전용 JS -->
+    <script src="./js/topchart_page.js"></script>
+  </body>
+</html>
