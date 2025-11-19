@@ -155,12 +155,14 @@ def _get_psql_client() -> PsqlDBClient:
 
 
 def _get_daily_price_table() -> str:
-    table = os.environ.get("DAILY_PRICE_TABLE_NAME", "stock_daily_prices")
-    if not table or not all(ch.isalnum() or ch == "_" for ch in table):
+    schema = os.environ.get("DAILY_PRICE_SCHEMA_NAME", "anticsignal")
+    table = os.environ.get("DAILY_PRICE_TABLE_NAME", "stock_history")
+    table_name = f"{schema}.{table}"
+    if not table_name or not all(ch.isalnum() or ch == "_" for ch in table):
         raise ValueError(
             "DAILY_PRICE_TABLE_NAME 환경 변수에는 영문/숫자/언더스코어만 사용할 수 있습니다."
         )
-    return table
+    return table_name
 
 
 def _cache_current_prices(payloads: List[Dict[str, Any]]) -> None:
@@ -205,6 +207,27 @@ def _cache_time_itemconclusion(rows: List[Dict[str, Any]]) -> None:
         service.set(f"stock:{code}:intraday_ticks", json.dumps(items, default=str))
 
 
+def _cache_investor_trade(rows: List[Dict[str, Any]]) -> None:
+    """투자자 매매동향(일별) 데이터를 Redis에 캐시한다."""
+    if not rows:
+        return
+    service = _get_redis_service()
+    grouped: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        code = (
+            row.get("requested_fid_input_iscd")
+            or row.get("mksc_shrn_iscd")
+            or row.get("stck_shrn_iscd")
+        )
+        if not code:
+            continue
+        grouped[code].append(row)
+    for code, items in grouped.items():
+        service.set(
+            f"stock:{code}:investor_trade_daily", json.dumps(items, default=str)
+        )
+
+
 def _safe_decimal(value: Any) -> Optional[Decimal]:
     """문자열/숫자를 Decimal 로 변환한다."""
     if value is None or value == "":
@@ -229,22 +252,55 @@ def _persist_daily_chartprice(rows: List[Dict[str, Any]]) -> None:
         "DO UPDATE SET stck_clpr = EXCLUDED.stck_clpr, stck_oprc = EXCLUDED.stck_oprc"
     )
     inserted = 0
-    with client.cursor() as cur:
-        for row in rows:
-            code = (
-                row.get("requested_fid_input_iscd")
-                or row.get("mksc_shrn_iscd")
-                or row.get("stck_shrn_iscd")
-            )
-            trade_date = row.get("stck_bsop_date")
-            period_code = row.get("requested_fid_period_div_code")
-            close_price = _safe_decimal(row.get("stck_clpr"))
-            open_price = _safe_decimal(row.get("stck_oprc"))
-            if not code or not trade_date or not period_code or close_price is None or open_price is None:
-                continue
-            cur.execute(insert_sql, (code, period_code, trade_date, close_price, open_price))
-            inserted += 1
-    logging.info("Persisted %d chart price rows into %s", inserted, table_name)
+    skipped = 0
+    try:
+        with client.cursor() as cur:
+            for row in rows:
+                code = (
+                    row.get("requested_fid_input_iscd")
+                    or row.get("mksc_shrn_iscd")
+                    or row.get("stck_shrn_iscd")
+                )
+                trade_date = row.get("stck_bsop_date")
+                period_code = row.get("requested_fid_period_div_code")
+                close_price = _safe_decimal(row.get("stck_clpr"))
+                open_price = _safe_decimal(row.get("stck_oprc"))
+                missing_fields = [
+                    name
+                    for name, value in [
+                        ("fid_input_iscd", code),
+                        ("stck_bsop_date", trade_date),
+                        ("fid_period_div_code", period_code),
+                        ("stck_clpr", close_price),
+                        ("stck_oprc", open_price),
+                    ]
+                    if value in (None, "")
+                ]
+                if missing_fields:
+                    skipped += 1
+                    logging.warning(
+                        "Skip chartprice row due to missing fields %s. raw=%s",
+                        ",".join(missing_fields),
+                        row,
+                    )
+                    continue
+                cur.execute(
+                    insert_sql,
+                    (code, period_code, trade_date, close_price, open_price),
+                )
+                inserted += 1
+    except Exception as exc:
+        logging.exception(
+            "Failed to upsert daily chart price rows into %s: %s", table_name, exc
+        )
+        raise
+    logging.info(
+        "Persisted %d chart price rows into %s (skipped=%d, incoming=%d)",
+        inserted,
+        table_name,
+        skipped,
+        len(rows),
+    )
 
 
 # Function 별 스케줄과 Event Hub를 환경 변수 기반으로 계산한다.
@@ -253,11 +309,12 @@ DEFAULT_EVENT_HUB_NAME = os.environ["AnticSignalEventHubName"]
 VOLUME_RANK_EVENT_HUB_NAME = os.environ.get(
     "VolumeRankEventHubName", DEFAULT_EVENT_HUB_NAME
 )
-EVENT_HUB_CONSUMER_GROUP = os.environ.get(
-    "EventHubConsumerGroup", "$Default"
-)
+EVENT_HUB_CONSUMER_GROUP = os.environ.get("EventHubConsumerGroup", "$Default")
 INVESTOR_TRADE_EVENT_HUB = os.environ.get(
     "INVESTOR_TRADE_EVENT_HUB_NAME", DEFAULT_EVENT_HUB_NAME
+)
+STOCK_HISTORICAL_DATA_EVENT_HUB = os.environ.get(
+    "StockHistoricalDataHubName", "StockHistoricalDataHubName"
 )
 
 
@@ -376,11 +433,6 @@ def inquire_time_itemconclusion_from_event(events: Sequence[func.EventHubEvent])
 
 # 투자자 매매동향
 @app.function_name(name="kis_investor_trade_by_stock_daily_from_event")
-@app.event_hub_output(
-    arg_name="investor_trade_output",
-    event_hub_name=INVESTOR_TRADE_EVENT_HUB,
-    connection="AnticSignalEventConnectionString",
-)
 @app.event_hub_message_trigger(
     arg_name="events",
     event_hub_name=VOLUME_RANK_EVENT_HUB_NAME,
@@ -389,7 +441,6 @@ def inquire_time_itemconclusion_from_event(events: Sequence[func.EventHubEvent])
 )
 def investor_trade_by_stock_daily_from_event(
     events: Sequence[func.EventHubEvent],
-    investor_trade_output: func.Out[str],
 ) -> None:  # type: ignore
     """Event Hub 메시지를 받아 종목별 투자자 매매동향(일별)을 수집한다."""
     normalized_events = _ensure_event_sequence(events)
@@ -418,7 +469,7 @@ def investor_trade_by_stock_daily_from_event(
                 )
 
         if aggregated:
-            investor_trade_output.set(json.dumps(aggregated, default=str))
+            _cache_investor_trade(aggregated)
             logging.info(
                 "Fetched %d investor trade rows for event sequence=%s",
                 len(aggregated),
@@ -427,13 +478,21 @@ def investor_trade_by_stock_daily_from_event(
 
 
 @app.function_name(name="kis_inquire_daily_chartprice_from_event")
+@app.event_hub_output(
+    arg_name="stock_history_output",
+    event_hub_name=STOCK_HISTORICAL_DATA_EVENT_HUB,
+    connection="AnticSignalEventConnectionString",
+)
 @app.event_hub_message_trigger(
     arg_name="events",
     event_hub_name=VOLUME_RANK_EVENT_HUB_NAME,
     connection="AnticSignalEventConnectionString",
     consumer_group=EVENT_HUB_CONSUMER_GROUP,
 )
-def inquire_daily_chartprice_from_event(events: Sequence[func.EventHubEvent]) -> None:  # type: ignore
+def inquire_daily_chartprice_from_event(
+    events: Sequence[func.EventHubEvent],
+    stock_history_output: func.Out[str],
+) -> None:  # type: ignore
     """Event Hub 메시지를 받아 1년치 시세 데이터를 조회하고 PostgreSQL에 저장한다."""
     normalized_events = _ensure_event_sequence(events)
 
@@ -458,9 +517,17 @@ def inquire_daily_chartprice_from_event(events: Sequence[func.EventHubEvent]) ->
                     "Failed to fetch daily chart price for %s: %s", code, exc
                 )
 
-        _persist_daily_chartprice(aggregated)
-        logging.info(
-            "Fetched %d chart price rows for event sequence=%s",
-            len(aggregated),
-            getattr(event, "sequence_number", None),
-        )
+        if aggregated:
+            logging.info(f"historical data {aggregated}")
+            stock_history_output.set(json.dumps(aggregated, default=str))
+            logging.info(
+                "Emitted %d chart price rows to %s",
+                len(aggregated),
+                STOCK_HISTORICAL_DATA_EVENT_HUB,
+            )
+            _persist_daily_chartprice(aggregated)
+            logging.info(
+                "Fetched %d chart price rows for event sequence=%s",
+                len(aggregated),
+                getattr(event, "sequence_number", None),
+            )
