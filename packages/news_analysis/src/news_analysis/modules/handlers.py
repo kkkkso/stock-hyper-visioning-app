@@ -1,9 +1,22 @@
 import json
-from typing import Generator, Any
+from typing import Generator, Any, Union
+import logging
 
 __all__ = (
     'JSONLoader',
+    'FileHandler'
 )
+
+
+class FileHandler:
+    @staticmethod
+    def save_to_json(data: Union[dict, list[dict]], path: str='./news.json'):
+        if not data:
+            raise ValueError(f"Empty or unexpeceted type of data: {type(data)}")
+        with open(path, encoding='utf-8', mode='w') as f:
+            f.write(json.dumps(data, indent=4, ensure_ascii=False))
+            logging.info(f'Saved result txt file to {path}')
+
 
 class JSONLoader:
     """제너레이터를 반환하는 JSONLoader.

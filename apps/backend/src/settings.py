@@ -23,7 +23,7 @@ class ApiSettings(BaseSettings):
     
     # Redis Settings
     REDIS_HOST: str             = getenv('REDIS_HOST', 'localhost')
-    REDIS_PORT: int             = int(getenv('REDIS_HOST', 6379))
+    REDIS_PORT: int             = int(getenv('REDIS_PORT', 6379))
     REDIS_PASSWORD: Optional[str] = getenv('REDIS_PASSWORD')
     REDIS_DATABASE: int         = 0
 

@@ -3,8 +3,8 @@
 # azure-monitor-opentelemetry
 
 azure-functions
-https://github.com/donghwan0206/stock-hyper-visioning-app/releases/download/1.1.0/kis_api-1.1.0-py3-none-any.whl
-https://github.com/AnticSignal/stock-hyper-visioning-app/releases/download/v0.1.0_antic_ext/antic_extensions-0.1.0-py3-none-any.whl
+../../../../packages/kis_api
+../../../../packages/antic_extensions
 certifi==2025.7.9
 charset-normalizer==3.4.2
 httpx==0.28.1

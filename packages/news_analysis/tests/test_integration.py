@@ -1,22 +1,19 @@
 import pytest
-from pprint import pprint
-from src.news_analysis import NewsDataPipelineAPI
-from src.news_analysis.modules.handlers import JSONLoader
+from news_analysis.core import NewsDataPipelineAPI
+from news_analysis.modules import FileHandler
+from pathlib import Path
 import json
 
+
 def test_integration():
-    # mock_api_res = './tests/news.json'
-    # items = list(JSONLoader()(mock_api_res))
-    # filtered_items = [e for e in items
-    #                   if 'items' in e][0]['items']
-    
     api = NewsDataPipelineAPI()
-    # selected = api.select_top_k_by_date(filtered_items, 5, 'descending')
-    result = api.fetch_news_from_naver_api(query="인공지능")
-    pprint(result)
-    with open('./tests/scrapped.json', 'w', encoding='utf-8') as f:
-        f.write(json.dumps(
-            result, 
-            ensure_ascii=False, 
-            indent=4
-        ))
+    result = api.fetch_news_from_naver_api(
+        '삼성전자',
+        web_scrap_content=True
+    )
+    print(result)
+    if result:
+        FileHandler.save_to_json(
+            result, str(Path("./news_test.json"))
+        )
+
