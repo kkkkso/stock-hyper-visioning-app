@@ -224,13 +224,4 @@ def top10_meta_redis(events: Sequence[func.EventHubEvent]) -> None:  # type: ign
         except Exception:
             logging.exception("Failed to save TOP10 meta to Redis.")
 
-@app.route(route="top10_meta_preview", methods=["GET"])
-def top10_meta_preview(req: func.HttpRequest) -> func.HttpResponse:
-    value = redis_service.get(REDIS_TOP10_KEY)
-    return func.HttpResponse(
-        value or '{"items":[]}',
-        status_code=200,
-        mimetype="application/json"
-    )
-
 
