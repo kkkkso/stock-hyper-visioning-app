@@ -20,10 +20,17 @@ __all__ = (
 class NaverApiClient(HttpClient):
     NAVER_API_SEARCH_ENDPOINT_VAR = "https://openapi.naver.com/v1/search/{service_id}"
 
-    def __init__(self, service: str='news') -> None:
+    def __init__(
+            self, 
+            api_client_id: Optional[str]=None,
+            api_secret_key: Optional[str]=None,
+            service: str='news',
+    ) -> None:
         super().__init__(self.NAVER_API_SEARCH_ENDPOINT_VAR.format(
             service_id=f"{service}.json"
         ))
+        self._api_client_id = api_client_id or getenv('NAVER_API_CLIENT_ID')
+        self._api_secret_key = api_secret_key or getenv('NAVER_API_CLIENT_SECRET')
 
     def get(self, params: Optional[dict] = None, **kwargs) -> dict | None:
         """
@@ -33,8 +40,8 @@ class NaverApiClient(HttpClient):
         """
         params = params or {}
         default_headers = {
-            'X-Naver-Client-Id': getenv('NAVER_API_CLIENT_ID'),
-            'X-Naver-Client-Secret': getenv('NAVER_API_CLIENT_SECRET')
+            'X-Naver-Client-Id': self._api_client_id,
+            'X-Naver-Client-Secret': self._api_secret_key
         }
         user_headers = kwargs.get('headers', {})
         kwargs['headers'] = {
@@ -50,8 +57,22 @@ class NaverApiClient(HttpClient):
 class NaverNewsFetchService:
     _SERVICE_NAME = 'news'
 
-    def __init__(self) -> None:
-        self._client = NaverApiClient(service=self._SERVICE_NAME)
+    def __init__(
+            self,
+            api_client_id: Optional[str]=None,
+            api_secret_key: Optional[str]=None
+    ) -> None:
+        """뉴스 Fetch 서비스
+
+        Args:
+            api_client_id (Optional[str], optional): 발급된 API 아이디
+            api_secret_key (Optional[str], optional): 발급된 시크릿 키
+        """
+        self._client = NaverApiClient(
+            api_client_id=api_client_id,
+            api_secret_key=api_secret_key,
+            service=self._SERVICE_NAME,
+        )
 
     def fetch_naver_news_api(
             self, 

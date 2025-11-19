@@ -3,7 +3,7 @@ __all__ = (
 )
 import logging
 from fastapi import FastAPI
-from ..routes import eventhub, core
+from ..routes import eventhub, core, stock, news
 
 
 class CoreApp(
@@ -30,6 +30,8 @@ class CoreApp(
 
     def register_routes(self):
         """라우트를 일괄 등록한다."""
-        self.include_router(core.router, tags=["Chat"])
-        self.include_router(eventhub.router, prefix="/eventhub", tags=["Cloud"])
+        self.include_router(core.router, prefix="/api/v1", tags=["Chat"])
+        self.include_router(stock.router, prefix="/api/v1/stock", tags=["Cloud"])
+        self.include_router(news.router, prefix="/api/v1/news", tags=["Cloud"])
+        self.include_router(eventhub.router, prefix="/api/v1/eventhub", tags=["Cloud"])
 

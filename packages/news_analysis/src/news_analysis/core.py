@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from typing import Union
+from typing import Union, Optional
 from .modules import *
 from .service import *
 
@@ -19,14 +19,24 @@ except Exception as e:
 class NewsDataPipelineAPI:
     """뉴스 데이터를 전처리하고 집계/가공할 수 있는 기능을 제공하는 API 클래스.
 
-    >>> api = NewsDataPipelineAPI()
+    >>> api = NewsDataPipelineAPI(...)      # .env 혹은 자격증명 입력
     >>> results = api.fetch_news_from_naver_api('삼성전자')
       
     >>> api.select_top_k_by_date(results)
     
     """
-    def __init__(self) -> None:
-        pass
+    def __init__(
+            self,
+            api_client_id: Optional[str]=None,
+            api_secret_key: Optional[str]=None
+    ) -> None:
+        """
+        Args:
+            api_client_id (Optional[str], optional): 발급된 API 아이디
+            api_secret_key (Optional[str], optional): 발급된 시크릿 키
+        """
+        self._api_client_id = api_client_id
+        self._api_secret_key = api_secret_key
 
     def fetch_news_from_naver_api(
         self,
@@ -53,7 +63,9 @@ class NewsDataPipelineAPI:
         :param preprocess: (bool) 문자열 전처리 여부. 
         """
 
-        fetch_service = NaverNewsFetchService()
+        fetch_service = NaverNewsFetchService(
+            self._api_client_id, self._api_secret_key
+        )
         result = fetch_service.fetch_naver_news_api(query, sort, display)
 
         if web_scrap_content and result:
