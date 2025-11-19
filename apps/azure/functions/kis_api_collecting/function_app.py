@@ -246,10 +246,10 @@ def _persist_daily_chartprice(rows: List[Dict[str, Any]]) -> None:
     table_name = _get_daily_price_table()
     client = _get_psql_client()
     insert_sql = (
-        f"INSERT INTO {table_name} (fid_input_iscd, fid_period_div_code, stck_bsop_date, stck_clpr, stck_oprc) "
-        "VALUES (%s, %s, %s::date, %s, %s) "
+        f"INSERT INTO {table_name} (fid_input_iscd, fid_period_div_code, stck_bsop_date, stck_clpr, stck_oprc, acml_vol) "
+        "VALUES (%s, %s, %s::date, %s, %s, %s) "
         "ON CONFLICT (fid_input_iscd, fid_period_div_code, stck_bsop_date) "
-        "DO UPDATE SET stck_clpr = EXCLUDED.stck_clpr, stck_oprc = EXCLUDED.stck_oprc"
+        "DO UPDATE SET stck_clpr = EXCLUDED.stck_clpr, stck_oprc = EXCLUDED.stck_oprc, acml_vol = EXCLUDED.acml_vol"
     )
     inserted = 0
     skipped = 0
@@ -265,6 +265,7 @@ def _persist_daily_chartprice(rows: List[Dict[str, Any]]) -> None:
                 period_code = row.get("requested_fid_period_div_code")
                 close_price = _safe_decimal(row.get("stck_clpr"))
                 open_price = _safe_decimal(row.get("stck_oprc"))
+                volume = _safe_decimal(row.get("acml_vol"))
                 missing_fields = [
                     name
                     for name, value in [
@@ -273,6 +274,7 @@ def _persist_daily_chartprice(rows: List[Dict[str, Any]]) -> None:
                         ("fid_period_div_code", period_code),
                         ("stck_clpr", close_price),
                         ("stck_oprc", open_price),
+                        ("acml_vol", volume),
                     ]
                     if value in (None, "")
                 ]
@@ -286,7 +288,7 @@ def _persist_daily_chartprice(rows: List[Dict[str, Any]]) -> None:
                     continue
                 cur.execute(
                     insert_sql,
-                    (code, period_code, trade_date, close_price, open_price),
+                    (code, period_code, trade_date, close_price, open_price, volume),
                 )
                 inserted += 1
     except Exception as exc:
