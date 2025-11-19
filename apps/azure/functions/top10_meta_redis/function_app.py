@@ -2,6 +2,8 @@ import json
 import logging
 import os
 from typing import Iterable, List, Sequence
+from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 import azure.functions as func
 from antic_extensions import RedisService, PsqlDBClient
@@ -66,7 +68,7 @@ def build_top10_meta(rows: List[dict]) -> List[dict]:
         if not isinstance(row, dict):
             continue
 
-        meta:dict = {}
+        meta: dict = {}
         # 컬럼명 그대로 사용
         for field in VOLUME_RANK_FIELDS:
             meta[field] = row.get(field)
@@ -89,6 +91,7 @@ def build_top10_meta(rows: List[dict]) -> List[dict]:
     )
 
     return top10
+
 
 def extract_rows_from_event(payload_str: str) -> List[dict]:
     """
@@ -118,6 +121,7 @@ def extract_rows_from_event(payload_str: str) -> List[dict]:
 
     # dict 아닌 건 필터링
     return [r for r in rows if isinstance(r, dict)]
+
 
 # Market_type 붙이는 헬퍼 함수
 def enrich_with_market_type(top10_meta: List[dict]) -> List[dict]:
@@ -164,14 +168,21 @@ def enrich_with_market_type(top10_meta: List[dict]) -> List[dict]:
 
 
 # EventHub Trigger 함수
-@app.function_name(name="top10_meta_redis") 
-@app.event_hub_message_trigger(arg_name="events", event_hub_name=os.environ["AnticSignalEventHubName"],
-                               connection="AnticSignalEventHubConnectionString",
-                               consumer_group="antic-signal-top10-redis_kis-vol_consumer_group") 
+@app.function_name(name="top10_meta_redis")
+@app.event_hub_message_trigger(
+    arg_name="events",
+    event_hub_name=os.environ["AnticSignalEventHubName"],
+    connection="AnticSignalEventHubConnectionString",
+    consumer_group="antic-signal-top10-redis_kis-vol_consumer_group",
+)
 def top10_meta_redis(events: Sequence[func.EventHubEvent]) -> None:  # type: ignore
     """Event Hub 에서 거래량 순위 데이터를 읽어 TOP10 메타를 Redis 에 캐시한다."""
     if not isinstance(events, Sequence):
         events = [events]
+
+    kst = timezone(timedelta(hours=9))  # KST (UTC+9) 고정 타임존
+    now_kst_str = datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")
+
     logging.info("Received %d event(s) from EventHub.", len(events))
 
     for event in events:
@@ -207,8 +218,9 @@ def top10_meta_redis(events: Sequence[func.EventHubEvent]) -> None:  # type: ign
             logging.exception("Failed to serialize TOP10 meta for preview log.")
 
         try:
+
             payload_str = json.dumps(
-                {"items": top10_meta},
+                {"updated_at": now_kst_str, "items": top10_meta},
                 ensure_ascii=False,
                 default=str,
             )
@@ -223,5 +235,4 @@ def top10_meta_redis(events: Sequence[func.EventHubEvent]) -> None:  # type: ign
             )
         except Exception:
             logging.exception("Failed to save TOP10 meta to Redis.")
-
 
