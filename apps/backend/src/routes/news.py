@@ -2,7 +2,7 @@ from fastapi import Depends, APIRouter, HTTPException
 from ..services import (
     HistoricalStockDataQueryService 
 )
-from ..core import (
+from ..core.clients import (
     get_psql_client, 
     PsqlDBClient
 )
@@ -10,7 +10,8 @@ from ..core import (
 router = APIRouter()
 
 
-@router.get("/news/stock/{unique_id}")
+## /api/v1/news/stock
+@router.get("/stock/{unique_id}")
 def get_stock_news_data(
         unique_id: str,
         sql_client: PsqlDBClient = Depends(get_psql_client)

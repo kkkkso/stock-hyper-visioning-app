@@ -10,10 +10,14 @@ __all__ = (
 )
 
 class HistoricalStockDataQueryService:
-    """실시간 주식 데이터를 Redis로 부터 캐시한다.
+    """누적 주식 데이터와 뉴스 데이터 등 실시간성이 아닌 데이터를 조회하고 
+    적절하게 반환하도록 한다. 내부적으로 PostgreSQL에 접속하여 쿼리를 수행한다.  
     """
     def __init__(self, sql_client: Optional[PsqlDBClient]) -> None:
-        """실시간 주식 데이터를 Redis로 부터 캐시하는 헬퍼 클래스를 생성.  
+        """누적 주식 데이터나 뉴스 데이터 등 비실시간성 데이터를 PostgreSQL에서 
+        쿼리하기 위한 서비스 클래스를 생성한다. 이미 기존에 생성된 client를 주입할 
+        경우 해당 클라이언트를 강제 적용하지만, `None`으로 미지정시 ``settings.api_settings``의 
+        설정 값에 따라 자동으로 생성한다. (`SQL_HOST`, `SQL_USER`, `SQL_DATABASE`... 등)  
 
         >>> client = PsqlDBClient(...)
             service = HistoricalStockDataQueryService(client)
@@ -23,7 +27,8 @@ class HistoricalStockDataQueryService:
         Args:
             sql_client (PsqlDBClient, optional): sql_client를 입력할 경우 해당 클라이언트를 이용합니다.
                                                 `None`으로 미기입시 자동으로 내부적으로 새로운 클라이언트를 
-                                                생성합니다. 
+                                                생성합니다. 이때는 ``settings.api_settings``의 설정 값을 
+                                                따라 자동으로 생성됩니다.  
         """
         if api_settings.SQL_PASSWORD is None:
             raise EnvironmentError("SQL_PASSWORD is not provided.")

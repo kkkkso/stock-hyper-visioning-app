@@ -1,6 +1,6 @@
 import pytest
 from pprint import pprint
-from src.news_analysis.service import NaverNewsDataResponseService
+from src.news_analysis.service import NaverNewsDataProcessorService
 from src.news_analysis.modules.handlers import JSONLoader
 
 def test_data_response():

@@ -8,11 +8,10 @@ from typing import TypedDict, Literal, Union, Iterable
 from ..modules import (
     TextTagCleaner, 
     pubdate_to_datetime,
-    get_naver_news_contents
 )
 
 __all__ = (
-    'NaverNewsDataResponseService',
+    'NaverNewsDataProcessorService',
     'NaverNewsApiResultTDict',
     'NaverNewsContentTDict',
     'TSort'
@@ -43,7 +42,9 @@ class NaverNewsContentTDict(TypedDict):
     """방문한 News 페이지의 컨텐츠 데이터에 대한 형식
     >>> [
         {
-            "url": "https://n.news.naver.com/mnews/article/030/0003369731?sid=105",
+            "index: 5,
+            "link": "https://n.news.naver.com/mnews/article/030/0003369731?sid=105",
+            "originallink": "https://www.etnews.com/20251110000159",
             "title": "리벨리온, 美 법인 설립…오라클 출신 임원 영입",
             "content": "리벨리온은 글로벌 시장 공략을 위해 미국에 법인을 설립하고, 오라클 출신 반도체 전문가를 영입했다고 13일 밝혔다.",
             "pubDate": "Mon, 10 Nov 2025 11:13:00 +0900"
@@ -51,12 +52,14 @@ class NaverNewsContentTDict(TypedDict):
         ...
     ]
     """
-    url: str
+    index: int
+    link: str
+    originallink: str
     title: str
     content: str
     pubDate: str | datetime
 
-class NaverNewsDataResponseService:
+class NaverNewsDataProcessorService:
     """네이버 뉴스 데이터에 대해 클라이언트에서 바로 사용가능한 형태로 데이터를 제공하는 클래스."""
 
     def __init__(self) -> None:
@@ -173,28 +176,3 @@ class NaverNewsDataResponseService:
         )
         return top_k
     
-
-    def get_naver_news_context_data_items(
-            self,
-            query: str,
-            debug = False
-        ):
-        def print_scrapped_results(
-                scraped_results: Iterable[NaverNewsApiResultTDict]
-            ) -> None:
-            if scraped_results:
-                print(scraped_results)
-                for res in scraped_results:
-                    try:
-                        print(f"\nURL: {res['url']}")
-                        print(f"제목: {res['title']}")
-                        print("--- 본문 (앞 100자) ---")
-                        print(res['content'][:100] + "...")
-                        print("-" * 20)
-                    except KeyError as e:
-                        print(e)
-
-        scraped_results = get_naver_news_contents(query)
-        if debug:
-            print_scrapped_results(scraped_results)
-        return scraped_results

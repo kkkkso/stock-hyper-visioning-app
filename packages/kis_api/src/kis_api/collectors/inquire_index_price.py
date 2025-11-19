@@ -23,8 +23,8 @@ def fetch_inquire_index_price(
 ) -> Dict[str, Any]:
     """국내 업종 현재 지수 API를 호출해 응답 본문을 반환한다."""
     params = {
-        "FID_COND_MRKT_DIV_CODE": fid_cond_mrkt_div_code,
-        "FID_INPUT_ISCD": fid_input_iscd,
+        "FID_COND_MRKT_DIV_CODE": str(fid_cond_mrkt_div_code),
+        "FID_INPUT_ISCD": str(fid_input_iscd),
     }
     response = client.request(
         METHOD,
