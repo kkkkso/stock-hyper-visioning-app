@@ -4,7 +4,7 @@ import os
 from typing import Iterable, List, Sequence
 
 import azure.functions as func
-from antic_extensions import RedisService
+from antic_extensions import RedisService, PsqlDBClient
 
 # FunctionApp 인스턴스 생성
 app = func.FunctionApp()
@@ -21,8 +21,16 @@ redis_service = RedisService(
 )
 logging.info("Initialized RedisService for TOP10 meta cache.")
 
+# PostgreSQL 클라이언트(master_krx_code 조회용)
+psql_client = PsqlDBClient(
+    host=os.environ["PG_HOST"],
+    user=os.environ["PG_USER"],
+    password=os.environ["PG_PASSWORD"],
+    database=os.environ["PG_DATABASE"],
+)
+logging.info("Initialized PsqlDBClient for master_krx_code lookup.")
+
 # volume_rank_fields 정의
-# 맨 위 어딘가에 필드 리스트 정의해 두면 좋아
 VOLUME_RANK_FIELDS = [
     "hts_kor_isnm",
     "mksc_shrn_iscd",
@@ -111,6 +119,48 @@ def extract_rows_from_event(payload_str: str) -> List[dict]:
     # dict 아닌 건 필터링
     return [r for r in rows if isinstance(r, dict)]
 
+# Market_type 붙이는 헬퍼 함수
+def enrich_with_market_type(top10_meta: List[dict]) -> List[dict]:
+    """
+    master_krx_code를 조회해서 KOSPI / KOSDAQ 구분(market)을
+    top10_meta 각 항목에 붙인다.
+    """
+    codes = [m.get("mksc_shrn_iscd") for m in top10_meta if m.get("mksc_shrn_iscd")]
+    if not codes:
+        return top10_meta
+
+    try:
+        # DISTINCT만 남기기 (optional)
+        codes = list(set(codes))
+
+        sql = """
+            SELECT mksc_shrn_iscd, market
+            FROM anticsignal.master_krx_code
+            WHERE mksc_shrn_iscd = ANY(%s)
+        """
+        market_map: dict[str, str] = {}
+
+        with psql_client.cursor() as cur:
+            cur.execute(sql, (codes,))
+            rows = cur.fetchall()
+            for code, market in rows:
+                market_map[code] = market
+
+        logging.info(
+            "Loaded market from master_krx_code: %d rows (codes=%s)",
+            len(market_map),
+            list(market_map.keys()),
+        )
+
+        # meta에 market 붙이기
+        for meta in top10_meta:
+            code = meta.get("mksc_shrn_iscd")
+            meta["market"] = market_map.get(code)  # 없으면 None
+
+    except Exception:
+        logging.exception("Failed to enrich TOP10 meta with market from Postgres.")
+
+    return top10_meta
 
 
 # EventHub Trigger 함수
@@ -146,13 +196,15 @@ def top10_meta_redis(events: Sequence[func.EventHubEvent]) -> None:  # type: ign
             logging.info("No TOP10 meta built from rows, skip.")
             continue
 
-        # 🔍 TOP10 전체 JSON 프리뷰 로그
+        # ✅ 여기서 Postgres(master_krx_code) 조회해서 market 붙이기
+        top10_meta = enrich_with_market_type(top10_meta)
+
+        # 🔍 TOP10 전체 JSON 프리뷰 로그 (market까지 포함된 상태로)
         try:
             preview_str = json.dumps(top10_meta, ensure_ascii=False, default=str)
             logging.info("TOP10 meta full preview (truncated): %s", preview_str[:1500])
         except Exception:
             logging.exception("Failed to serialize TOP10 meta for preview log.")
-
 
         try:
             payload_str = json.dumps(
@@ -160,6 +212,7 @@ def top10_meta_redis(events: Sequence[func.EventHubEvent]) -> None:  # type: ign
                 ensure_ascii=False,
                 default=str,
             )
+
             # antic_extensions.RedisService 사용
             redis_service.set(REDIS_TOP10_KEY, payload_str)
             logging.info(
@@ -179,3 +232,5 @@ def top10_meta_preview(req: func.HttpRequest) -> func.HttpResponse:
         status_code=200,
         mimetype="application/json"
     )
+
+
