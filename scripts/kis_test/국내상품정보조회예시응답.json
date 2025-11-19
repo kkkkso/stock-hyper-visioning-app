@@ -1,0 +1,27 @@
+{
+    "output": {
+        "pdno": "AAPL",
+        "prdt_type_cd": "512",
+        "prdt_name": "애플",
+        "prdt_name120": "애플",
+        "prdt_abrv_name": "애플",
+        "prdt_eng_name": "APPLE INC",
+        "prdt_eng_name120": "APPLE INC",
+        "prdt_eng_abrv_name": "APPLE INC",
+        "std_pdno": "US0378331005",
+        "shtn_pdno": "AAPL",
+        "prdt_sale_stat_cd": "",
+        "prdt_risk_grad_cd": "",
+        "prdt_clsf_cd": "101210",
+        "prdt_clsf_name": "해외주식",
+        "sale_strt_dt": "",
+        "sale_end_dt": "",
+        "wrap_asst_type_cd": "06",
+        "ivst_prdt_type_cd": "1012",
+        "ivst_prdt_type_cd_name": "해외주식",
+        "frst_erlm_dt": ""
+    },
+    "rt_cd": "0",
+    "msg_cd": "KIOK0530",
+    "msg1": "조회되었습니다                                                                  "
+}
